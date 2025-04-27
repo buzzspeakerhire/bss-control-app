@@ -6,6 +6,7 @@ import 'advanced_control_screen.dart';
 import 'control_screen.dart';
 import 'panel_import_screen.dart';
 import 'venue_edit_screen.dart';
+import 'communication_test_screen.dart';
 import '../services/panel_parser.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -122,6 +123,26 @@ class _HomeScreenState extends State<HomeScreen> {
         _buildVenuesSection(),
         const Divider(),
         _buildRecentPanelsSection(),
+        // Add Communication Test Button
+        Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: ElevatedButton.icon(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const CommunicationTestScreen(),
+                ),
+              );
+            },
+            icon: const Icon(Icons.cable),
+            label: const Text('Run Communication Test'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.orange,
+              foregroundColor: Colors.white,
+            ),
+          ),
+        ),
       ],
     );
   }
