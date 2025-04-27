@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:io';
 import 'package:xml/xml.dart';
 import '../models/panel_model.dart';
@@ -237,7 +236,6 @@ class PanelParser {
       }
     } catch (e) {
       // Use a logger instead of print in production code
-      // print('Error parsing color: $colorStr, $e');
     }
     
     return 0xFF000000; // Default to black

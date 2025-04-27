@@ -1,6 +1,5 @@
-import 'dart:typed_data';
+// ignore_for_file: constant_identifier_names, avoid_print
 
-/// Service for creating and parsing BSS London Direct Inject protocol messages
 class BssProtocolService {
   // Message types
   static const int SET = 0x88;
