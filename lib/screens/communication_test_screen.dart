@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../services/device_communication_service.dart';
-import '../models/state_variable_model.dart';
 
 
 class CommunicationTestScreen extends StatefulWidget {
