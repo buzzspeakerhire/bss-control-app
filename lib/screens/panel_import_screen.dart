@@ -43,8 +43,7 @@ class _PanelImportScreenState extends State<PanelImportScreen> {
 
     try {
       final result = await FilePicker.platform.pickFiles(
-        type: FileType.custom,
-        allowedExtensions: ['panel'],
+        type: FileType.any,
       );
 
       if (result != null && result.files.isNotEmpty) {

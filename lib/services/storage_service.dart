@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/panel_model.dart';
+import '../services/panel_parser.dart';
 
 class StorageService {
   static const String _venuesKey = 'venues';
@@ -217,20 +218,25 @@ class StorageService {
   
   /// Import a panel file from external storage
   Future<String> importPanelFile(File sourceFile) async {
-    try {
-      final panelsDir = await _panelsDir;
-      final filename = sourceFile.path.split('/').last;
-      final destFile = File('${panelsDir.path}/$filename');
-      
-      // Copy the file
-      await sourceFile.copy(destFile.path);
-      
-      // Add to recent panels
-      await _addToRecentPanels(filename);
-      
-      return filename;
-    } catch (e) {
-      throw Exception('Failed to import panel file: $e');
-    }
+  try {
+    final panelsDir = await _panelsDir;
+    final filename = sourceFile.path.split('/').last;
+    final destFile = File('${panelsDir.path}/$filename');
+    
+    // Parse the panel file from XML format
+    final panelParser = PanelParser();
+    final panel = await panelParser.parseFromFile(sourceFile.path);
+    
+    // Convert to our internal JSON format and save
+    final panelJson = jsonEncode(panel.toMap());
+    await destFile.writeAsString(panelJson);
+    
+    // Add to recent panels
+    await _addToRecentPanels(filename);
+    
+    return filename;
+  } catch (e) {
+    throw Exception('Failed to import panel file: $e');
   }
+}
 }

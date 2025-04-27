@@ -18,25 +18,31 @@ class PanelParser {
 
   /// Parse panel XML from a string
   Panel parseFromString(String xmlString) {
-    try {
-      final document = XmlDocument.parse(xmlString);
-      final panelNode = document.findAllElements('PANEL').first;
-      
-      // Parse panel properties
-      final panel = _parsePanelProperties(panelNode);
-      
-      // Parse state variables
-      panel.stateVariables = _parseStateVariables(panelNode);
-      
-      // Parse controls
-      panel.controls = _parseControls(panelNode, panel.stateVariables);
-      
-      return panel;
-    } catch (e) {
-      throw Exception('Failed to parse panel XML: $e');
+  try {
+    final document = XmlDocument.parse(xmlString);
+    
+    // Find the Panel element - note the case sensitivity!
+    final panelNodes = document.findAllElements('Panel');
+    if (panelNodes.isEmpty) {
+      throw Exception('No Panel element found in the XML');
     }
+    
+    final panelNode = panelNodes.first;
+    
+    // Parse panel properties
+    final panel = _parsePanelProperties(panelNode);
+    
+    // Parse state variables
+    panel.stateVariables = _parseStateVariables(panelNode);
+    
+    // Parse controls
+    panel.controls = _parseControls(panelNode, panel.stateVariables);
+    
+    return panel;
+  } catch (e) {
+    throw Exception('Failed to parse panel XML: $e');
   }
-
+}
   /// Parse panel basic properties
   Panel _parsePanelProperties(XmlElement panelNode) {
     final panel = Panel(
