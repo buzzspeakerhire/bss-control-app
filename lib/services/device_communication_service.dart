@@ -2,8 +2,8 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
 import 'dart:convert';
-import '../models/state_variable_model.dart';
 import 'package:logging/logging.dart';
+import '../models/state_variable_model.dart';
 
 /// Service for communicating with BSS devices using the London Direct Inject protocol
 class DeviceCommunicationService {
@@ -26,27 +26,43 @@ class DeviceCommunicationService {
   }
   
   // Protocol constants
+  // ignore: constant_identifier_names
   static const int START_BYTE = 0x02;
+  // ignore: constant_identifier_names
   static const int END_BYTE = 0x03;
+  // ignore: constant_identifier_names
   static const int ACK_BYTE = 0x06;
+  // ignore: constant_identifier_names
   static const int NAK_BYTE = 0x15;
+  // ignore: constant_identifier_names
   static const int ESCAPE_BYTE = 0x1B;
   
   // Message types
+  // ignore: constant_identifier_names
   static const int SET_RAW = 0x88;
+  // ignore: constant_identifier_names
   static const int SUBSCRIBE_RAW = 0x89;
+  // ignore: constant_identifier_names
   static const int UNSUBSCRIBE_RAW = 0x8A;
+  // ignore: constant_identifier_names
   static const int RECALL_PRESET = 0x8C;
+  // ignore: constant_identifier_names
   static const int SET_PERCENT = 0x8D;
+  // ignore: constant_identifier_names
   static const int SUBSCRIBE_PERCENT = 0x8E;
+  // ignore: constant_identifier_names
   static const int UNSUBSCRIBE_PERCENT = 0x8F;
+  // ignore: constant_identifier_names
   static const int BUMP_PERCENT = 0x90;
   
   // Virtual device types
+  // ignore: constant_identifier_names
   static const int AUDIO_DEVICE = 0x03;
+  // ignore: constant_identifier_names
   static const int LOGIC_DEVICE = 0x02;
   
   // TCP port for Soundweb London devices
+  // ignore: constant_identifier_names
   static const int TCP_PORT = 1023;
   
   // Map of device connections (deviceId -> Socket)
@@ -224,9 +240,9 @@ class DeviceCommunicationService {
       parameterId: parameterId,
     ));
     
-    _log.info('Parameter update: Node:0x${nodeAddress.toRadixString(16).padLeft(4, '0')}, ' +
-        'Obj:0x${objectId.toRadixString(16).padLeft(6, '0')}, ' +
-        'Param:0x${parameterId.toRadixString(16).padLeft(4, '0')}, ' +
+    _log.info('Parameter update: Node:0x${nodeAddress.toRadixString(16).padLeft(4, '0')}, ' 
+        'Obj:0x${objectId.toRadixString(16).padLeft(6, '0')}, '
+        'Param:0x${parameterId.toRadixString(16).padLeft(4, '0')}, '
         'Value:$value');
   }
   
@@ -257,9 +273,9 @@ class DeviceCommunicationService {
       parameterId: parameterId,
     ));
     
-    _log.info('Parameter update (percent): Node:0x${nodeAddress.toRadixString(16).padLeft(4, '0')}, ' +
-        'Obj:0x${objectId.toRadixString(16).padLeft(6, '0')}, ' +
-        'Param:0x${parameterId.toRadixString(16).padLeft(4, '0')}, ' +
+    _log.info('Parameter update (percent): Node:0x${nodeAddress.toRadixString(16).padLeft(4, '0')}, '
+        'Obj:0x${objectId.toRadixString(16).padLeft(6, '0')}, '
+        'Param:0x${parameterId.toRadixString(16).padLeft(4, '0')}, '
         'Value:${percentValue.toStringAsFixed(2)}%');
   }
   
@@ -586,6 +602,7 @@ class DeviceCommunicationService {
   }
   
   // Enqueue a command (for serial communication)
+  // ignore: unused_element
   void _enqueueCommand(String deviceId, List<int> command) {
     if (!_commandQueues.containsKey(deviceId)) {
       _commandQueues[deviceId] = [];
@@ -696,6 +713,7 @@ class DeviceCommunicationService {
   }
   
   // Convert int to bytes
+  // ignore: unused_element
   List<int> _intToBytes(int value, int numBytes) {
     final bytes = <int>[];
     for (var i = numBytes - 1; i >= 0; i--) {

@@ -39,6 +39,7 @@ dependencies:
   file_picker: ^5.3.2  # For selecting files
   intl: ^0.18.0  # For formatting numbers and dates
   cupertino_icons: ^1.0.2  # Keep this line from the original
+  logging: ^1.2.0  # Added for logging functionality
 
 
 dev_dependencies:
