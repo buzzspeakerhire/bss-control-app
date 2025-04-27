@@ -1,8 +1,12 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
+import 'package:logging/logging.dart';
 
 class UdpService {
+  // Logger
+  final _log = Logger('UdpService');
+  
   // Singleton pattern
   static final UdpService _instance = UdpService._internal();
   
@@ -10,23 +14,42 @@ class UdpService {
     return _instance;
   }
   
-  UdpService._internal();
+  UdpService._internal() {
+    // Initialize logger
+    Logger.root.level = Level.ALL;
+    Logger.root.onRecord.listen((record) {
+      _log.info('${record.level.name}: ${record.time}: ${record.message}');
+    });
+  }
   
   // Protocol constants
+  // ignore: constant_identifier_names
   static const int STX = 0x02; // Start of message
+  // ignore: constant_identifier_names
   static const int ETX = 0x03; // End of message
+  // ignore: constant_identifier_names
   static const int ACK = 0x06; // Acknowledge
+  // ignore: constant_identifier_names
   static const int NAK = 0x15; // Not acknowledge
+  // ignore: constant_identifier_names
   static const int ESC = 0x1B; // Escape character
   
   // Message types
+  // ignore: constant_identifier_names
   static const int SET_RAW = 0x88;
+  // ignore: constant_identifier_names
   static const int SUBSCRIBE_RAW = 0x89;
+  // ignore: constant_identifier_names
   static const int UNSUBSCRIBE_RAW = 0x8A;
+  // ignore: constant_identifier_names
   static const int RECALL_PRESET = 0x8C;
+  // ignore: constant_identifier_names
   static const int SET_PERCENT = 0x8D;
+  // ignore: constant_identifier_names
   static const int SUBSCRIBE_PERCENT = 0x8E;
+  // ignore: constant_identifier_names
   static const int UNSUBSCRIBE_PERCENT = 0x8F;
+  // ignore: constant_identifier_names
   static const int BUMP_PERCENT = 0x90;
   
   // Storage for active connections
@@ -61,7 +84,7 @@ class UdpService {
       
       return true;
     } catch (e) {
-      print('Error initializing UDP socket: $e');
+      _log.severe('Error initializing UDP socket: $e');
       return false;
     }
   }
@@ -87,14 +110,14 @@ class UdpService {
     try {
       final socket = _sockets[deviceId];
       if (socket == null) {
-        print('Socket for device $deviceId not initialized');
+        _log.warning('Socket for device $deviceId not initialized');
         return false;
       }
       
       final sent = socket.send(Uint8List.fromList(message), InternetAddress(ipAddress), port);
       return sent > 0;
     } catch (e) {
-      print('Error sending UDP message: $e');
+      _log.severe('Error sending UDP message: $e');
       return false;
     }
   }
@@ -136,7 +159,7 @@ class UdpService {
           }
         } else {
           // Invalid checksum
-          print('Invalid checksum received from $deviceId');
+          _log.warning('Invalid checksum received from $deviceId');
         }
       }
     }

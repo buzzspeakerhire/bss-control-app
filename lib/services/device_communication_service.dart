@@ -1,7 +1,5 @@
 import 'dart:async';
 import 'dart:io';
-import 'dart:typed_data';
-import 'dart:convert';
 import 'package:logging/logging.dart';
 import '../models/state_variable_model.dart';
 
@@ -21,7 +19,8 @@ class DeviceCommunicationService {
     // Initialize logger
     Logger.root.level = Level.ALL;
     Logger.root.onRecord.listen((record) {
-      print('${record.level.name}: ${record.time}: ${record.message}');
+      // Using logger instead of print
+      _log.info('${record.level.name}: ${record.time}: ${record.message}');
     });
   }
   
@@ -229,7 +228,7 @@ class DeviceCommunicationService {
     final value = _extractValueFromBytes(valueBytes);
     
     // Create a unique state variable ID
-    final stateVarId = '${nodeAddress}_${virtualDevice}_${objectId}_${parameterId}';
+    final stateVarId = '${nodeAddress}_$virtualDevice}_${objectId}_$parameterId';
     
     // Notify listeners
     _valueChangedController.add(StateVariableUpdate(
@@ -262,7 +261,7 @@ class DeviceCommunicationService {
     double percentValue = (rawValue / 65536) * 100;
     
     // Create a unique state variable ID
-    final stateVarId = '${nodeAddress}_${virtualDevice}_${objectId}_${parameterId}';
+    final stateVarId = '${nodeAddress}_$virtualDevice}_${objectId}_$parameterId';
     
     // Notify listeners
     _valueChangedController.add(StateVariableUpdate(
