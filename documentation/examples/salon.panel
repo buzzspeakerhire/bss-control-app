@@ -1,0 +1,239 @@
+﻿<Panels xml:lang="en-US" Version="Audio Architect">
+  <ImageLibrarian Index="2429">
+    <Items>
+      <ItemEntry Handle="30" ResType="THIS_DLL" ResourceName="HPRO.SDIG.Controls.Images.Nudge_Up_AH.png" ImageHash="4BufkcOyELMxdIzYIXrDRw==" />
+      <ItemEntry Handle="31" ResType="THIS_DLL" ResourceName="HPRO.SDIG.Controls.Images.Nudge_Up_Pushed_AH.png" ImageHash="T90t2KIs1WdKW5G1+YMvmg==" />
+      <ItemEntry Handle="32" ResType="THIS_DLL" ResourceName="HPRO.SDIG.Controls.Images.Nudge_Down_AH.png" ImageHash="GBfjHwUVOn3INWhpo2E9tw==" />
+      <ItemEntry Handle="33" ResType="THIS_DLL" ResourceName="HPRO.SDIG.Controls.Images.Nudge_Down_Pushed_AH.png" ImageHash="ZcrRbIql1ZGL1NSxhvC5xw==" />
+      <ItemEntry Handle="2054" ResType="THIS_DLL" ResourceName="HPRO.SDIG.Controls.Images.Faders.Slider4.png" ImageHash="KDegBR5pEl133QkQeSyc+w==" />
+    </Items>
+  </ImageLibrarian>
+  <Panel Version="1" Name="Salon test" Text="Salon test" FormBorderStyle="None" Size="768, 1024" BackColor="40, 40, 40" ForeColor="WhiteSmoke" Font="Microsoft Sans Serif, 9pt" BackgroundImageLayout="Tile" ControlBox="True" MaximizeBox="False" MinimizeBox="True" ShowInTaskbar="True" SizeGripStyle="Auto" StartPosition="WindowsDefaultLocation" TopMost="false" PanelType="iPadPortrait" IsInDesignerMode="True" RecycleButton="False" IsRecyclePoint="True">
+    <ExtraFormProperties>
+      <Version>1</Version>
+      <FormId>0,0,6239490</FormId>
+      <StartBehavior>WindowsDefaultLocation</StartBehavior>
+      <HideCursor>False</HideCursor>
+      <GroupingWizardGenerated>False</GroupingWizardGenerated>
+      <ShowIcon>True</ShowIcon>
+      <StartLocation>0, 0</StartLocation>
+    </ExtraFormProperties>
+    <Control Name="FaderVertical1" Type="HPRO.SDIG.Controls.HProSliderV" Assembly="HProControlLibrary, Version=0.1.0.108, Culture=neutral, PublicKeyToken=null" ControlKey="a378799b-6f34-4070-a27d-82a9db02848b" Text="FaderVertical1" BackColor="Transparent" Font="Microsoft Sans Serif, 7pt" TabIndex="262" TabStop="True" Location="482, 363" Size="88, 512" AllowDrop="True" HProLocked="False">
+      <ComplexProperties Tag="HProSVControl">
+        <StateVariableItems Length="1">
+          <StateVariableItem IsSVFromAppNode="False" NodeID="1" VdIndex="3" ObjID="368" svID="0" nubIdx="0" NodeClassID="301" SVClassID="106" ObjectClassID="257" />
+        </StateVariableItems>
+      </ComplexProperties>
+      <ControlProperties>
+        <BumpUpHandle>30</BumpUpHandle>
+        <BumpDnPHandle>33</BumpDnPHandle>
+        <InsideMargin>0.07</InsideMargin>
+        <LabelsInside>False</LabelsInside>
+        <MinOverride>False</MinOverride>
+        <SVMax>0dB</SVMax>
+        <Orientation>Vertical</Orientation>
+        <DisplayPopup>False</DisplayPopup>
+        <ChannelEnd>0.95</ChannelEnd>
+        <BumpDnHandle>32</BumpDnHandle>
+        <KnobHandle>2054</KnobHandle>
+        <AutoValueLocation>0, 0</AutoValueLocation>
+        <InterfaceType>Percent</InterfaceType>
+        <SVMin>-∞dB</SVMin>
+        <ChannelCenter>0.4</ChannelCenter>
+        <BumpUpPHandle>31</BumpUpPHandle>
+        <LabelVertical>False</LabelVertical>
+        <Version>1.1</Version>
+        <MinLen>3</MinLen>
+        <SliderSize>40, 59</SliderSize>
+        <TickLocation>RightSide</TickLocation>
+        <BumpIncrement>5</BumpIncrement>
+        <BumpLocation>None</BumpLocation>
+        <MinColor>210, 210, 210</MinColor>
+        <SliderBias>1, 0</SliderBias>
+        <MajColor>WhiteSmoke</MajColor>
+        <MajLen>8</MajLen>
+        <TickCount>12</TickCount>
+        <MaxOverride>True</MaxOverride>
+        <ValueFormat>0.</ValueFormat>
+        <ChannelWidth>3</ChannelWidth>
+        <BumpSeperation>0</BumpSeperation>
+        <ExtendSensitivity>FaderCap</ExtendSensitivity>
+        <CustomScaleMode>None</CustomScaleMode>
+        <DispTicks>True</DispTicks>
+        <ChannelColor>145, 112, 219</ChannelColor>
+        <MinorInterval>4</MinorInterval>
+        <TickLabels>False</TickLabels>
+        <ChannelStart>0.05</ChannelStart>
+      </ControlProperties>
+    </Control>
+    <Control Name="FaderVertical2" Type="HPRO.SDIG.Controls.HProSliderV" Assembly="HProControlLibrary, Version=0.1.0.108, Culture=neutral, PublicKeyToken=null" ControlKey="6bcb2ab1-88ed-4f76-9207-ffb2828c1c99" Text="FaderVertical1" BackColor="Transparent" Font="Microsoft Sans Serif, 7pt" TabIndex="261" TabStop="True" Location="258, 363" Size="88, 512" AllowDrop="True" HProLocked="False">
+      <ComplexProperties Tag="HProSVControl">
+        <StateVariableItems Length="1">
+          <StateVariableItem IsSVFromAppNode="False" NodeID="1" VdIndex="3" ObjID="362" svID="0" nubIdx="0" NodeClassID="301" SVClassID="106" ObjectClassID="257" />
+        </StateVariableItems>
+      </ComplexProperties>
+      <ControlProperties>
+        <BumpUpHandle>30</BumpUpHandle>
+        <BumpDnPHandle>33</BumpDnPHandle>
+        <InsideMargin>0.07</InsideMargin>
+        <LabelsInside>False</LabelsInside>
+        <MinOverride>False</MinOverride>
+        <SVMax>0dB</SVMax>
+        <Orientation>Vertical</Orientation>
+        <DisplayPopup>False</DisplayPopup>
+        <ChannelEnd>0.95</ChannelEnd>
+        <BumpDnHandle>32</BumpDnHandle>
+        <KnobHandle>2054</KnobHandle>
+        <AutoValueLocation>0, 0</AutoValueLocation>
+        <InterfaceType>Percent</InterfaceType>
+        <SVMin>-∞dB</SVMin>
+        <ChannelCenter>0.4</ChannelCenter>
+        <BumpUpPHandle>31</BumpUpPHandle>
+        <LabelVertical>False</LabelVertical>
+        <Version>1.1</Version>
+        <MinLen>3</MinLen>
+        <SliderSize>40, 59</SliderSize>
+        <TickLocation>RightSide</TickLocation>
+        <BumpIncrement>5</BumpIncrement>
+        <BumpLocation>None</BumpLocation>
+        <MinColor>210, 210, 210</MinColor>
+        <SliderBias>1, 0</SliderBias>
+        <MajColor>WhiteSmoke</MajColor>
+        <MajLen>8</MajLen>
+        <TickCount>12</TickCount>
+        <MaxOverride>True</MaxOverride>
+        <ValueFormat>0.</ValueFormat>
+        <ChannelWidth>3</ChannelWidth>
+        <BumpSeperation>0</BumpSeperation>
+        <ExtendSensitivity>FaderCap</ExtendSensitivity>
+        <CustomScaleMode>None</CustomScaleMode>
+        <DispTicks>True</DispTicks>
+        <ChannelColor>145, 112, 219</ChannelColor>
+        <MinorInterval>4</MinorInterval>
+        <TickLabels>False</TickLabels>
+        <ChannelStart>0.05</ChannelStart>
+      </ControlProperties>
+    </Control>
+    <Control Name="MeterFast1" Type="HPRO.SDIG.Controls.HProFastMeter" Assembly="HProControlLibrary, Version=0.1.0.108, Culture=neutral, PublicKeyToken=null" ControlKey="873a2f27-c62e-4d11-a1f2-49a5034c077a" Text="MeterFast1" BackColor="Black" TabIndex="258" TabStop="False" Location="234, 387" Size="9, 464" AllowDrop="True" HProLocked="False">
+      <ComplexProperties Tag="HProSVControl">
+        <StateVariableItems Length="1">
+          <StateVariableItem IsSVFromAppNode="False" NodeID="1" VdIndex="3" ObjID="364" svID="0" nubIdx="0" NodeClassID="301" SVClassID="107" ObjectClassID="318" />
+        </StateVariableItems>
+      </ComplexProperties>
+      <ControlProperties>
+        <LowColor>0, 225, 0</LowColor>
+        <ValueFormat>0.##</ValueFormat>
+        <Version>1</Version>
+        <MaxOverride>False</MaxOverride>
+        <MidColor>225, 225, 0</MidColor>
+        <MinOverride>False</MinOverride>
+        <HighColor>225, 0, 0</HighColor>
+      </ControlProperties>
+    </Control>
+    <Control Thickness="2" AntiAlias="True" Name="Rectangle3" Type="HPRO.SDIG.GraphicsControls.RectangleGC" Assembly="HProControlLibrary, Version=0.1.0.108, Culture=neutral, PublicKeyToken=null" ControlKey="a5fba836-3224-417b-80bd-c6953bcec2db" ForeColor="WhiteSmoke" TabIndex="259" TabStop="False" Location="162, 355" Size="216, 528" AllowDrop="False" HProLocked="False">
+      <ControlProperties>
+        <GradientColorStart>DimGray</GradientColorStart>
+        <Version>1.1</Version>
+        <Rounded>False</Rounded>
+        <Radius>25</Radius>
+        <GradientColorEnd>Gainsboro</GradientColorEnd>
+        <PaintStyle>EmptyBrush</PaintStyle>
+        <GradientMode>Vertical</GradientMode>
+      </ControlProperties>
+    </Control>
+    <Control Name="TextLabel3" Type="HPRO.SDIG.Controls.HProAnnotation" Assembly="HProControlLibrary, Version=0.1.0.108, Culture=neutral, PublicKeyToken=null" ControlKey="51c913c5-77e4-4f2f-95d6-9e26ad0d2caf" Text="TextLabel1" BackColor="145, 112, 219" Font="Microsoft Sans Serif, 10.2pt" ForeColor="WhiteSmoke" TabIndex="257" TabStop="False" Location="161, 299" Size="216, 49" AllowDrop="False" HProLocked="False">
+      <ComplexProperties Tag="HProAnnotation">
+        <TextLines Length="1">
+          <Line>SALON</Line>
+        </TextLines>
+      </ComplexProperties>
+      <ControlProperties>
+        <RightColor>Transparent</RightColor>
+        <BorderColor>Transparent</BorderColor>
+        <GradientMode>Horizontal</GradientMode>
+        <LeftColor>Transparent</LeftColor>
+        <DisplayQBandwidth>False</DisplayQBandwidth>
+        <Version>1</Version>
+        <PaintStyle>SolidBrush</PaintStyle>
+        <Alignment>MiddleCenter</Alignment>
+        <Border>Flat</Border>
+      </ControlProperties>
+    </Control>
+    <Control Name="MeterFast2" Type="HPRO.SDIG.Controls.HProFastMeter" Assembly="HProControlLibrary, Version=0.1.0.108, Culture=neutral, PublicKeyToken=null" ControlKey="3e88ee74-51a2-4450-af82-32e758292c4f" Text="MeterFast1" BackColor="Black" TabIndex="255" TabStop="False" Location="465, 387" Size="9, 464" AllowDrop="True" HProLocked="False">
+      <ComplexProperties Tag="HProSVControl">
+        <StateVariableItems Length="1">
+          <StateVariableItem IsSVFromAppNode="False" NodeID="1" VdIndex="3" ObjID="370" svID="0" nubIdx="0" NodeClassID="301" SVClassID="107" ObjectClassID="318" />
+        </StateVariableItems>
+      </ComplexProperties>
+      <ControlProperties>
+        <LowColor>0, 225, 0</LowColor>
+        <ValueFormat>0.##</ValueFormat>
+        <Version>1</Version>
+        <MaxOverride>False</MaxOverride>
+        <MidColor>225, 225, 0</MidColor>
+        <MinOverride>False</MinOverride>
+        <HighColor>225, 0, 0</HighColor>
+      </ControlProperties>
+    </Control>
+    <Control Thickness="2" AntiAlias="True" Name="Rectangle4" Type="HPRO.SDIG.GraphicsControls.RectangleGC" Assembly="HProControlLibrary, Version=0.1.0.108, Culture=neutral, PublicKeyToken=null" ControlKey="a2697112-c69c-4805-9f6c-ad79634e7835" ForeColor="WhiteSmoke" TabIndex="256" TabStop="False" Location="383, 355" Size="216, 528" AllowDrop="False" HProLocked="False">
+      <ControlProperties>
+        <GradientColorStart>DimGray</GradientColorStart>
+        <Version>1.1</Version>
+        <Rounded>False</Rounded>
+        <Radius>25</Radius>
+        <GradientColorEnd>Gainsboro</GradientColorEnd>
+        <PaintStyle>EmptyBrush</PaintStyle>
+        <GradientMode>Vertical</GradientMode>
+      </ControlProperties>
+    </Control>
+    <Control Name="TextLabel4" Type="HPRO.SDIG.Controls.HProAnnotation" Assembly="HProControlLibrary, Version=0.1.0.108, Culture=neutral, PublicKeyToken=null" ControlKey="40ff0ae2-da66-4ad3-bcfc-375bda447bd5" Text="TextLabel1" BackColor="145, 112, 219" Font="Microsoft Sans Serif, 10.2pt" ForeColor="WhiteSmoke" TabIndex="254" TabStop="False" Location="383, 299" Size="216, 49" AllowDrop="False" HProLocked="False">
+      <ComplexProperties Tag="HProAnnotation">
+        <TextLines Length="1">
+          <Line>MEZZANINE</Line>
+        </TextLines>
+      </ComplexProperties>
+      <ControlProperties>
+        <RightColor>Transparent</RightColor>
+        <BorderColor>Transparent</BorderColor>
+        <GradientMode>Horizontal</GradientMode>
+        <LeftColor>Transparent</LeftColor>
+        <DisplayQBandwidth>False</DisplayQBandwidth>
+        <Version>1</Version>
+        <PaintStyle>SolidBrush</PaintStyle>
+        <Alignment>MiddleCenter</Alignment>
+        <Border>Flat</Border>
+      </ControlProperties>
+    </Control>
+    <Control Name="ComboBox1" Type="HPRO.SDIG.Controls.HProComboBox" Assembly="HProControlLibrary, Version=0.1.0.108, Culture=neutral, PublicKeyToken=null" ControlKey="912cbbd3-e450-406b-8f5e-5d5607b94923" Text="ComboBox1" BackColor="DarkGray" Font="Microsoft Sans Serif, 9pt" ForeColor="Black" TabIndex="253" TabStop="True" Location="160, 242" Size="440, 48" AllowDrop="True" HProLocked="False">
+      <ComplexProperties Tag="HProDiscreteControl">
+        <UserList Length="3">
+          <StringList Value="0" Label="None" />
+          <StringList Value="1" Label="BGM" />
+          <StringList Value="2" Label="Salon Input" />
+        </UserList>
+      </ComplexProperties>
+      <ComplexProperties Tag="HProSVControl">
+        <StateVariableItems Length="1">
+          <StateVariableItem IsSVFromAppNode="False" NodeID="1" VdIndex="3" ObjID="289" svID="0" nubIdx="0" NodeClassID="301" SVClassID="128" ObjectClassID="311" />
+        </StateVariableItems>
+      </ComplexProperties>
+      <ControlProperties>
+        <ValueFormat>0.##</ValueFormat>
+        <Version>1.2</Version>
+        <Style>DropDownList</Style>
+        <SelectedItemColor>225, 112, 0</SelectedItemColor>
+      </ControlProperties>
+    </Control>
+    <Control Thickness="4" AntiAlias="True" Name="Rectangle5" Type="HPRO.SDIG.GraphicsControls.RectangleGC" Assembly="HProControlLibrary, Version=0.1.0.108, Culture=neutral, PublicKeyToken=null" ControlKey="8e63911d-7d15-42b5-805f-a28c4ba02b90" ForeColor="218, 163, 32" TabIndex="260" TabStop="False" Location="146, 228" Size="466, 671" AllowDrop="False" HProLocked="False">
+      <ControlProperties>
+        <GradientColorStart>DimGray</GradientColorStart>
+        <Version>1.1</Version>
+        <Rounded>False</Rounded>
+        <Radius>25</Radius>
+        <GradientColorEnd>Gainsboro</GradientColorEnd>
+        <PaintStyle>EmptyBrush</PaintStyle>
+        <GradientMode>Vertical</GradientMode>
+      </ControlProperties>
+    </Control>
+  </Panel>
+</Panels>
