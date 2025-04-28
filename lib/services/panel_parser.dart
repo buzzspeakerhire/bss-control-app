@@ -18,238 +18,303 @@ class PanelParser {
 
   /// Parse panel XML from a string
   Panel parseFromString(String xmlString) {
-  try {
-    final document = XmlDocument.parse(xmlString);
-    
-    // Find the Panel element - note the case sensitivity!
-    final panelNodes = document.findAllElements('Panel');
-    if (panelNodes.isEmpty) {
-      throw Exception('No Panel element found in the XML');
-    }
-    
-    final panelNode = panelNodes.first;
-    
-    // Parse panel properties
-    final panel = _parsePanelProperties(panelNode);
-    
-    // Parse state variables
-    panel.stateVariables = _parseStateVariables(panelNode);
-    
-    // Parse controls
-    panel.controls = _parseControls(panelNode, panel.stateVariables);
-    
-    return panel;
-  } catch (e) {
-    throw Exception('Failed to parse panel XML: $e');
-  }
-}
-  /// Parse panel basic properties
-  Panel _parsePanelProperties(XmlElement panelNode) {
-    final panel = Panel(
-      id: panelNode.getAttribute('id') ?? '',
-      name: panelNode.getAttribute('name') ?? 'Unnamed Panel',
-      width: int.tryParse(panelNode.getAttribute('width') ?? '0') ?? 0,
-      height: int.tryParse(panelNode.getAttribute('height') ?? '0') ?? 0,
-      backgroundColor: _parseColor(panelNode.getAttribute('backcolor')),
-      foregroundColor: _parseColor(panelNode.getAttribute('forecolor')),
-      stateVariables: [],
-      controls: [],
-    );
-    
-    return panel;
-  }
-
-  /// Parse all state variables from the panel
-  List<StateVariable> _parseStateVariables(XmlElement panelNode) {
-    final stateVariables = <StateVariable>[];
-    
-    final stateVarNodes = panelNode.findAllElements('STATEVARIABLE');
-    for (final node in stateVarNodes) {
-      stateVariables.add(_parseStateVariable(node));
-    }
-    
-    return stateVariables;
-  }
-
-  /// Parse a single state variable
-  StateVariable _parseStateVariable(XmlElement node) {
-    final id = node.getAttribute('id') ?? '';
-    final name = node.getAttribute('name') ?? '';
-    final type = node.getAttribute('type') ?? '';
-    final deviceIndex = int.tryParse(node.getAttribute('deviceidx') ?? '-1') ?? -1;
-    final objectIndex = int.tryParse(node.getAttribute('objectidx') ?? '-1') ?? -1;
-    final channel = int.tryParse(node.getAttribute('channel') ?? '-1') ?? -1;
-    
-    return StateVariable(
-      id: id,
-      name: name,
-      type: type,
-      deviceIndex: deviceIndex,
-      objectIndex: objectIndex,
-      channel: channel,
-    );
-  }
-
-  /// Parse all controls from the panel
-  List<Control> _parseControls(XmlElement panelNode, List<StateVariable> stateVariables) {
-    final controls = <Control>[];
-    
-    // Parse different control types
-    _parseControlType(panelNode, 'FADER', controls, stateVariables);
-    _parseControlType(panelNode, 'METER', controls, stateVariables);
-    _parseControlType(panelNode, 'BUTTON', controls, stateVariables);
-    _parseControlType(panelNode, 'LABEL', controls, stateVariables);
-    _parseControlType(panelNode, 'COMBO', controls, stateVariables);
-    // Add more control types as needed
-    
-    return controls;
-  }
-
-  /// Parse controls of a specific type
-  void _parseControlType(XmlElement panelNode, String controlType, 
-      List<Control> controls, List<StateVariable> stateVariables) {
-    
-    final controlNodes = panelNode.findAllElements(controlType);
-    for (final node in controlNodes) {
-      final control = _parseControl(node, controlType, stateVariables);
-      controls.add(control);
-    }
-  }
-
-  /// Parse a single control
-  Control _parseControl(XmlElement node, String controlType, List<StateVariable> stateVariables) {
-    final id = node.getAttribute('id') ?? '';
-    final name = node.getAttribute('name') ?? '';
-    final x = int.tryParse(node.getAttribute('left') ?? '0') ?? 0;
-    final y = int.tryParse(node.getAttribute('top') ?? '0') ?? 0;
-    final width = int.tryParse(node.getAttribute('width') ?? '0') ?? 0;
-    final height = int.tryParse(node.getAttribute('height') ?? '0') ?? 0;
-    final zOrder = int.tryParse(node.getAttribute('zorder') ?? '0') ?? 0;
-    
-    // Parse linked state variable references
-    final stateVarRef = node.getAttribute('statevariableref');
-    StateVariable? linkedStateVariable;
-    if (stateVarRef != null && stateVarRef.isNotEmpty) {
-      linkedStateVariable = stateVariables.firstWhere(
-        (sv) => sv.id == stateVarRef,
-        orElse: () => StateVariable(id: '', name: '', type: '')
+    try {
+      final document = XmlDocument.parse(xmlString);
+      
+      // Find the Panel element within Panels root
+      final panelsRoot = document.findAllElements('Panels').first;
+      final panelNode = panelsRoot.findAllElements('Panel').first;
+      
+      // Parse panel properties
+      final panel = Panel(
+        id: panelNode.getAttribute('Version') ?? '',
+        name: panelNode.getAttribute('Text') ?? 'Unnamed Panel',
+        width: _extractDimension(panelNode.getAttribute('Size'), 0),
+        height: _extractDimension(panelNode.getAttribute('Size'), 1),
+        backgroundColor: _parseColor(panelNode.getAttribute('BackColor')),
+        foregroundColor: _parseColor(panelNode.getAttribute('ForeColor')),
+        stateVariables: [],
+        controls: [],
       );
-    }
-    
-    // Parse control properties specific to the control type
-    final properties = <String, dynamic>{};
-    _parseControlProperties(node, properties, controlType);
-
-    return Control(
-      id: id,
-      name: name,
-      type: controlType,
-      x: x,
-      y: y,
-      width: width,
-      height: height,
-      zOrder: zOrder,
-      stateVariable: linkedStateVariable,
-      properties: properties,
-    );
-  }
-
-  /// Parse control-specific properties
-  void _parseControlProperties(XmlElement node, Map<String, dynamic> properties, String controlType) {
-    // Parse common properties
-    properties['visible'] = _parseBool(node.getAttribute('visible') ?? 'true');
-    properties['enabled'] = _parseBool(node.getAttribute('enabled') ?? 'true');
-    properties['backgroundColor'] = _parseColor(node.getAttribute('backcolor'));
-    properties['foregroundColor'] = _parseColor(node.getAttribute('forecolor'));
-    
-    // Parse control-specific properties
-    switch (controlType) {
-      case 'FADER':
-        properties['min'] = double.tryParse(node.getAttribute('min') ?? '0') ?? 0.0;
-        properties['max'] = double.tryParse(node.getAttribute('max') ?? '100') ?? 100.0;
-        properties['value'] = double.tryParse(node.getAttribute('value') ?? '0') ?? 0.0;
-        properties['orientation'] = node.getAttribute('orientation') ?? 'vertical';
-        properties['showTickMarks'] = _parseBool(node.getAttribute('showtickmarks') ?? 'false');
-        properties['style'] = node.getAttribute('style') ?? 'standard';
-        break;
+      
+      // Parse all controls
+      final controlNodes = panelNode.findAllElements('Control');
+      
+      // First pass: Extract all state variables
+      final stateVariables = <StateVariable>[];
+      
+      for (final controlNode in controlNodes) {
+        final stateVarItems = _findStateVariableItems(controlNode);
         
-      case 'METER':
-        properties['min'] = double.tryParse(node.getAttribute('min') ?? '0') ?? 0.0;
-        properties['max'] = double.tryParse(node.getAttribute('max') ?? '100') ?? 100.0;
-        properties['value'] = double.tryParse(node.getAttribute('value') ?? '0') ?? 0.0;
-        properties['orientation'] = node.getAttribute('orientation') ?? 'vertical';
-        properties['segments'] = int.tryParse(node.getAttribute('segments') ?? '10') ?? 10;
-        properties['style'] = node.getAttribute('style') ?? 'standard';
-        break;
-        
-      case 'BUTTON':
-        properties['buttonType'] = node.getAttribute('buttontype') ?? 'momentary';
-        properties['state'] = _parseBool(node.getAttribute('state') ?? 'false');
-        properties['text'] = node.getAttribute('text') ?? '';
-        properties['textAlignment'] = node.getAttribute('textalignment') ?? 'center';
-        properties['imageOn'] = node.getAttribute('imageon') ?? '';
-        properties['imageOff'] = node.getAttribute('imageoff') ?? '';
-        break;
-        
-      case 'LABEL':
-        properties['text'] = node.getAttribute('text') ?? '';
-        properties['textAlignment'] = node.getAttribute('textalignment') ?? 'left';
-        properties['fontSize'] = int.tryParse(node.getAttribute('fontsize') ?? '12') ?? 12;
-        properties['fontStyle'] = node.getAttribute('fontstyle') ?? 'normal';
-        break;
-        
-      case 'COMBO':
-        properties['selectedIndex'] = int.tryParse(node.getAttribute('selectedindex') ?? '0') ?? 0;
-        
-        // Parse combo box items
-        final items = <String>[];
-        final itemNodes = node.findAllElements('ITEM');
-        for (final itemNode in itemNodes) {
-          items.add(itemNode.innerText);
+        for (final item in stateVarItems) {
+          final nodeId = int.tryParse(item.getAttribute('NodeID') ?? '1') ?? 1;
+          final vdIndex = int.tryParse(item.getAttribute('VdIndex') ?? '3') ?? 3;
+          final objId = int.tryParse(item.getAttribute('ObjID') ?? '0') ?? 0;
+          final svId = int.tryParse(item.getAttribute('svID') ?? '0') ?? 0;
+          final svClassId = item.getAttribute('SVClassID') ?? '';
+          
+          // Create unique ID using the hex format as seen in the device parameters
+          final id = '${nodeId}_${vdIndex}_${objId}_${svId}';
+          final name = controlNode.getAttribute('Name') ?? 'Unnamed';
+          
+          final stateVar = StateVariable(
+            id: id,
+            name: name,
+            type: _determineStateVarType(svClassId),
+            deviceIndex: nodeId,
+            objectIndex: objId,
+            channel: svId,
+            value: null, // Initial value, will be updated during operation
+          );
+          
+          stateVariables.add(stateVar);
         }
-        properties['items'] = items;
-        break;
+      }
+      
+      panel.stateVariables = stateVariables;
+      
+      // Second pass: Create controls
+      for (final controlNode in controlNodes) {
+        final controlType = controlNode.getAttribute('Type') ?? '';
+        final mappedType = _mapBssControlType(controlType);
+        
+        // Skip non-control elements like rectangles
+        if (mappedType == 'UNKNOWN') continue;
+        
+        final stateVar = _findLinkedStateVariable(controlNode, stateVariables);
+        
+        final control = Control(
+          id: controlNode.getAttribute('ControlKey') ?? '',
+          name: controlNode.getAttribute('Name') ?? '',
+          type: mappedType,
+          x: _extractLocation(controlNode.getAttribute('Location'), 0),
+          y: _extractLocation(controlNode.getAttribute('Location'), 1),
+          width: _extractDimension(controlNode.getAttribute('Size'), 0),
+          height: _extractDimension(controlNode.getAttribute('Size'), 1),
+          zOrder: int.tryParse(controlNode.getAttribute('TabIndex') ?? '0') ?? 0,
+          stateVariable: stateVar,
+          properties: _extractControlProperties(controlNode, controlType, stateVar),
+        );
+        
+        panel.controls.add(control);
+      }
+      
+      return panel;
+    } catch (e) {
+      throw Exception('Failed to parse panel XML: $e');
     }
   }
-
-  /// Parse color from string
+  
+  // Find all StateVariableItem elements in a control
+  List<XmlElement> _findStateVariableItems(XmlElement controlNode) {
+    final items = <XmlElement>[];
+    
+    final complexProps = controlNode.findAllElements('ComplexProperties');
+    for (final prop in complexProps) {
+      if (prop.getAttribute('Tag') == 'HProSVControl') {
+        final stateVarItems = prop.findAllElements('StateVariableItem');
+        items.addAll(stateVarItems);
+      }
+    }
+    
+    return items;
+  }
+  
+  // Extract location (x,y) from a string like "123, 456"
+  int _extractLocation(String? location, int index) {
+    if (location == null) return 0;
+    
+    final parts = location.split(',');
+    if (parts.length <= index) return 0;
+    
+    return int.tryParse(parts[index].trim()) ?? 0;
+  }
+  
+  // Extract dimension (width,height) from a string like "123, 456"
+  int _extractDimension(String? size, int index) {
+    if (size == null) return 0;
+    
+    final parts = size.split(',');
+    if (parts.length <= index) return 0;
+    
+    return int.tryParse(parts[index].trim()) ?? 0;
+  }
+  
+  // Map BSS control types to our internal types
+  String _mapBssControlType(String bssType) {
+    if (bssType.contains('HProSlider')) {
+      return 'FADER';
+    } else if (bssType.contains('HProFastMeter')) {
+      return 'METER';
+    } else if (bssType.contains('HProComboBox')) {
+      return 'COMBO';
+    } else if (bssType.contains('HProAnnotation')) {
+      return 'LABEL';
+    } else if (bssType.contains('HProButton')) {
+      return 'BUTTON';
+    } else if (bssType.contains('Rectangle')) {
+      return 'UNKNOWN'; // We don't handle decorative elements
+    } else {
+      return 'UNKNOWN';
+    }
+  }
+  
+  // Find state variable linked to a control
+  StateVariable? _findLinkedStateVariable(XmlElement controlNode, List<StateVariable> allVars) {
+    final items = _findStateVariableItems(controlNode);
+    if (items.isEmpty) return null;
+    
+    final item = items.first;
+    final nodeId = int.tryParse(item.getAttribute('NodeID') ?? '1') ?? 1;
+    final vdIndex = int.tryParse(item.getAttribute('VdIndex') ?? '3') ?? 3;
+    final objId = int.tryParse(item.getAttribute('ObjID') ?? '0') ?? 0;
+    final svId = int.tryParse(item.getAttribute('svID') ?? '0') ?? 0;
+    
+    final id = '${nodeId}_${vdIndex}_${objId}_${svId}';
+    
+    // Find matching state variable
+    for (final sv in allVars) {
+      if (sv.id == id) return sv;
+    }
+    
+    return null;
+  }
+  
+  // Extract properties for each control type
+  Map<String, dynamic> _extractControlProperties(XmlElement controlNode, String controlType, StateVariable? stateVar) {
+    final props = <String, dynamic>{};
+    
+    // Add basic properties
+    props['text'] = controlNode.getAttribute('Text') ?? '';
+    
+    // Extract control properties from ControlProperties element
+    final controlPropsNodes = controlNode.findAllElements('ControlProperties');
+    if (controlPropsNodes.isNotEmpty) {
+      final controlProps = controlPropsNodes.first;
+      
+      for (final prop in controlProps.childElements) {
+        final propName = prop.localName;
+        final propValue = prop.innerText;
+        
+        // Handle specific property types
+        if (propValue.toLowerCase() == 'true' || propValue.toLowerCase() == 'false') {
+          props[propName] = propValue.toLowerCase() == 'true';
+        } else if (propName.toLowerCase().contains('color')) {
+          props[propName] = _parseColor(propValue);
+        } else if (double.tryParse(propValue) != null) {
+          props[propName] = double.parse(propValue);
+        } else {
+          props[propName] = propValue;
+        }
+      }
+    }
+    
+    // Add control-specific default properties
+    if (controlType.contains('HProSlider')) {
+      // Handle fader properties
+      props['min'] = _parseDbValue(props['SVMin'] ?? '-∞dB');
+      props['max'] = _parseDbValue(props['SVMax'] ?? '0dB');
+      props['value'] = -20.0; // Default starting value
+      props['orientation'] = controlType.contains('HProSliderV') ? 'vertical' : 'horizontal';
+    } else if (controlType.contains('HProFastMeter')) {
+      // Handle meter properties
+      props['min'] = -80.0;
+      props['max'] = 0.0;
+      props['value'] = -80.0;
+      props['orientation'] = 'vertical';
+      props['segments'] = 20;
+    } else if (controlType.contains('HProComboBox')) {
+      // Handle combo box properties
+      final items = <String>[];
+      int selectedIndex = 0;
+      
+      // Extract items from ComplexProperties/UserList
+      final userListProps = controlNode.findAllElements('ComplexProperties')
+          .where((p) => p.getAttribute('Tag') == 'HProDiscreteControl')
+          .toList();
+      
+      if (userListProps.isNotEmpty) {
+        final stringLists = userListProps.first.findAllElements('StringList');
+        for (final item in stringLists) {
+          items.add(item.getAttribute('Label') ?? '');
+        }
+      }
+      
+      props['items'] = items;
+      props['selectedIndex'] = selectedIndex;
+    } else if (controlType.contains('HProAnnotation')) {
+      // Handle label properties
+      props['textAlignment'] = props['Alignment'] ?? 'MiddleCenter';
+      
+      // Extract text lines
+      final textLines = <String>[];
+      final textLinesNodes = controlNode.findAllElements('TextLines');
+      if (textLinesNodes.isNotEmpty) {
+        final lineNodes = textLinesNodes.first.findAllElements('Line');
+        for (final line in lineNodes) {
+          textLines.add(line.innerText);
+        }
+      }
+      
+      if (textLines.isNotEmpty) {
+        props['text'] = textLines.join('\n');
+      }
+      
+      props['fontSize'] = 14; // Default font size
+    }
+    
+    return props;
+  }
+  
+  // Parse color from string like "145, 112, 219"
   int _parseColor(String? colorStr) {
     if (colorStr == null || colorStr.isEmpty) {
       return 0xFF000000; // Default to black
     }
     
     try {
-      // Try to parse ARGB hex value (e.g., "#FFAABBCC")
-      if (colorStr.startsWith('#')) {
-        final hexColor = colorStr.substring(1);
-        if (hexColor.length == 8) {
-          return int.parse('0x$hexColor');
-        } else if (hexColor.length == 6) {
-          return int.parse('0xFF$hexColor');
+      // Handle named colors
+      if (!colorStr.contains(',')) {
+        switch (colorStr.toLowerCase()) {
+          case 'black': return 0xFF000000;
+          case 'white': return 0xFFFFFFFF;
+          case 'whitesmoke': return 0xFFF5F5F5;
+          case 'transparent': return 0x00000000;
+          default: return 0xFF000000;
         }
       }
       
-      // Try to parse RGB decimal values (e.g., "255,128,64")
-      if (colorStr.contains(',')) {
-        final parts = colorStr.split(',');
-        if (parts.length >= 3) {
-          final r = int.tryParse(parts[0].trim()) ?? 0;
-          final g = int.tryParse(parts[1].trim()) ?? 0;
-          final b = int.tryParse(parts[2].trim()) ?? 0;
-          final a = parts.length > 3 ? int.tryParse(parts[3].trim()) ?? 255 : 255;
-          return (a << 24) | (r << 16) | (g << 8) | b;
-        }
+      // Parse RGB components
+      final parts = colorStr.split(',');
+      if (parts.length >= 3) {
+        final r = int.tryParse(parts[0].trim()) ?? 0;
+        final g = int.tryParse(parts[1].trim()) ?? 0;
+        final b = int.tryParse(parts[2].trim()) ?? 0;
+        final a = parts.length > 3 ? int.tryParse(parts[3].trim()) ?? 255 : 255;
+        
+        // ARGB format
+        return (a << 24) | (r << 16) | (g << 8) | b;
       }
     } catch (e) {
-      // Use a logger instead of print in production code
+      // Fallback to black on error
     }
     
-    return 0xFF000000; // Default to black
+    return 0xFF000000;
   }
-
-  /// Parse boolean from string
-  bool _parseBool(String boolStr) {
-    final lowerStr = boolStr.toLowerCase();
-    return lowerStr == 'true' || lowerStr == '1' || lowerStr == 'yes';
+  
+  // Parse dB value from string
+  double _parseDbValue(String dbStr) {
+    if (dbStr.contains('∞')) return double.negativeInfinity;
+    return double.tryParse(dbStr.replaceAll('dB', '').trim()) ?? 0.0;
+  }
+  
+  // Determine state variable type based on SVClassID
+  String _determineStateVarType(String? svClassId) {
+    switch (svClassId) {
+      case '106': return 'gain';    // Gain control objects
+      case '107': return 'meter';   // Meter display objects
+      case '128': return 'selector'; // Selector objects
+      default: return 'unknown';
+    }
   }
 }

@@ -42,18 +42,32 @@ class _PanelImportScreenState extends State<PanelImportScreen> {
     });
 
     try {
-      final result = await FilePicker.platform.pickFiles(
-        type: FileType.any,
-      );
+      // Try with any file type without extensions
+      final result = await FilePicker.platform.pickFiles();
 
       if (result != null && result.files.isNotEmpty) {
         final file = File(result.files.first.path!);
         _selectedFile = file;
         _filenameController.text = file.path.split('/').last;
 
+        // Check if it's a panel file by extension
+        if (!file.path.toLowerCase().endsWith('.panel')) {
+          setState(() {
+            _errorMessage = 'Selected file must have a .panel extension';
+            _isLoading = false;
+          });
+          return;
+        }
+
         // Try to parse the panel file
-        final panel = await _panelParser.parseFromFile(file.path);
-        _previewPanel = panel;
+        try {
+          final panel = await _panelParser.parseFromFile(file.path);
+          _previewPanel = panel;
+        } catch (parseError) {
+          setState(() {
+            _errorMessage = 'Error parsing panel file: $parseError';
+          });
+        }
       }
     } catch (e) {
       setState(() {
