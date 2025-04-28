@@ -62,19 +62,28 @@ class StorageService {
         throw Exception('Panel file not found: $filename');
       }
       
-      // Read file
-      final panelJson = await file.readAsString();
+      // Read file content
+      final content = await file.readAsString();
       
-      // Parse JSON
-      final panelMap = jsonDecode(panelJson) as Map<String, dynamic>;
-      
-      // Convert to Panel object
-      final panel = Panel.fromMap(panelMap);
-      
-      // Add to recent panels
-      await _addToRecentPanels(filename);
-      
-      return panel;
+      // Check if the content starts with '<' (XML) or '{' (JSON)
+      if (content.trim().startsWith('<')) {
+        // It's an XML file, parse directly with PanelParser
+        final panelParser = PanelParser();
+        return panelParser.parseFromString(content);
+      } else {
+        // It's a JSON file, parse as JSON
+        try {
+          final panelMap = jsonDecode(content) as Map<String, dynamic>;
+          final panel = Panel.fromMap(panelMap);
+          
+          // Add to recent panels
+          await _addToRecentPanels(filename);
+          
+          return panel;
+        } catch (e) {
+          throw Exception('Failed to parse panel JSON: $e');
+        }
+      }
     } catch (e) {
       throw Exception('Failed to load panel: $e');
     }
@@ -218,25 +227,32 @@ class StorageService {
   
   /// Import a panel file from external storage
   Future<String> importPanelFile(File sourceFile) async {
-  try {
-    final panelsDir = await _panelsDir;
-    final filename = sourceFile.path.split('/').last;
-    final destFile = File('${panelsDir.path}/$filename');
-    
-    // Parse the panel file from XML format
-    final panelParser = PanelParser();
-    final panel = await panelParser.parseFromFile(sourceFile.path);
-    
-    // Convert to our internal JSON format and save
-    final panelJson = jsonEncode(panel.toMap());
-    await destFile.writeAsString(panelJson);
-    
-    // Add to recent panels
-    await _addToRecentPanels(filename);
-    
-    return filename;
-  } catch (e) {
-    throw Exception('Failed to import panel file: $e');
+    try {
+      final panelsDir = await _panelsDir;
+      final filename = sourceFile.path.split('/').last;
+      final destFile = File('${panelsDir.path}/$filename');
+      
+      // Read source file content
+      final content = await sourceFile.readAsString();
+      
+      // Fix XML namespace issues before saving
+      String fixedContent = content;
+      if (content.contains('xml:lang')) {
+        fixedContent = content.replaceAll('xml:lang="en-US"', 'xmlLang="en-US"');
+        
+        // Write the fixed content to the destination
+        await destFile.writeAsString(fixedContent);
+      } else {
+        // Just copy the file if no fixes needed
+        await sourceFile.copy(destFile.path);
+      }
+      
+      // Add to recent panels
+      await _addToRecentPanels(filename);
+      
+      return filename;
+    } catch (e) {
+      throw Exception('Failed to import panel file: $e');
+    }
   }
-}
 }

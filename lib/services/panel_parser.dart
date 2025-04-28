@@ -3,13 +3,30 @@ import 'package:xml/xml.dart';
 import '../models/panel_model.dart';
 import '../models/control_model.dart';
 import '../models/state_variable_model.dart';
+import 'dart:math' as Math;
 
 class PanelParser {
   /// Parse a panel file and return a Panel object
   Future<Panel> parseFromFile(String filePath) async {
     try {
       final file = File(filePath);
+      
+      // Verify file exists and has content
+      if (!await file.exists()) {
+        throw Exception('Panel file does not exist: $filePath');
+      }
+      
       final content = await file.readAsString();
+      
+      if (content.isEmpty) {
+        throw Exception('Panel file is empty');
+      }
+      
+      // Quick check if this looks like XML
+      if (!content.trim().startsWith('<')) {
+        throw Exception('File does not appear to be XML: ${content.substring(0, Math.min(50, content.length))}');
+      }
+      
       return parseFromString(content);
     } catch (e) {
       throw Exception('Failed to parse panel file: $e');
@@ -19,11 +36,58 @@ class PanelParser {
   /// Parse panel XML from a string
   Panel parseFromString(String xmlString) {
     try {
-      final document = XmlDocument.parse(xmlString);
+      // Pre-process XML to handle namespace correctly
+      // Remove the xml:lang attribute that's causing issues
+      String fixedXml = xmlString;
+      
+      if (fixedXml.contains('xml:lang')) {
+        fixedXml = fixedXml.replaceAll('xml:lang="en-US"', 'xmlLang="en-US"');
+      }
+      
+      // Attempt to parse the XML
+      XmlDocument? document;
+      try {
+        document = XmlDocument.parse(fixedXml);
+      } catch (e) {
+        // Try a more aggressive fix if the first attempt fails
+        if (fixedXml.contains('xml:')) {
+          fixedXml = fixedXml.replaceAll(RegExp(r'xml:[a-zA-Z]+="[^"]*"'), '');
+          document = XmlDocument.parse(fixedXml);
+        } else {
+          rethrow; // If it's not a namespace issue, rethrow
+        }
+      }
+      
+      if (document == null) {
+        throw Exception('Failed to parse XML document');
+      }
       
       // Find the Panel element within Panels root
-      final panelsRoot = document.findAllElements('Panels').first;
-      final panelNode = panelsRoot.findAllElements('Panel').first;
+      final panelsElements = document.findAllElements('Panels').toList();
+      if (panelsElements.isEmpty) {
+        // Try to find any element that could be the panel
+        final allElements = document.findAllElements('*').toList();
+        if (allElements.isEmpty) {
+          throw Exception('Could not find any elements in the XML');
+        }
+        
+        throw Exception('Could not find Panels element in the XML. Available elements: ${allElements.map((e) => e.name.local).toSet()}');
+      }
+      
+      final panelsRoot = panelsElements.first;
+      final panelElements = panelsRoot.findAllElements('Panel').toList();
+      
+      if (panelElements.isEmpty) {
+        // Try to look for elements directly under the root
+        final directChildren = panelsRoot.childElements.toList();
+        if (directChildren.isEmpty) {
+          throw Exception('Could not find Panel element or any children within Panels element');
+        }
+        
+        throw Exception('Could not find Panel element within Panels element. Available children: ${directChildren.map((e) => e.name.local).toSet()}');
+      }
+      
+      final panelNode = panelElements.first;
       
       // Parse panel properties
       final panel = Panel(
@@ -38,7 +102,11 @@ class PanelParser {
       );
       
       // Parse all controls
-      final controlNodes = panelNode.findAllElements('Control');
+      final controlNodes = panelNode.findAllElements('Control').toList();
+      
+      if (controlNodes.isEmpty) {
+        print('Warning: No Control elements found in the panel');
+      }
       
       // First pass: Extract all state variables
       final stateVariables = <StateVariable>[];
@@ -53,8 +121,8 @@ class PanelParser {
           final svId = int.tryParse(item.getAttribute('svID') ?? '0') ?? 0;
           final svClassId = item.getAttribute('SVClassID') ?? '';
           
-          // Create unique ID using the hex format as seen in the device parameters
-          final id = '${nodeId}_${vdIndex}_${objId}_${svId}';
+          // Create unique ID using the format needed for device communication
+          final id = '${nodeId}_$vdIndex}_${objId}_$svId';
           final name = controlNode.getAttribute('Name') ?? 'Unnamed';
           
           final stateVar = StateVariable(
@@ -99,6 +167,10 @@ class PanelParser {
         panel.controls.add(control);
       }
       
+      if (panel.controls.isEmpty) {
+        print('Warning: No controls were created from the panel file');
+      }
+      
       return panel;
     } catch (e) {
       throw Exception('Failed to parse panel XML: $e');
@@ -109,10 +181,10 @@ class PanelParser {
   List<XmlElement> _findStateVariableItems(XmlElement controlNode) {
     final items = <XmlElement>[];
     
-    final complexProps = controlNode.findAllElements('ComplexProperties');
+    final complexProps = controlNode.findAllElements('ComplexProperties').toList();
     for (final prop in complexProps) {
       if (prop.getAttribute('Tag') == 'HProSVControl') {
-        final stateVarItems = prop.findAllElements('StateVariableItem');
+        final stateVarItems = prop.findAllElements('StateVariableItem').toList();
         items.addAll(stateVarItems);
       }
     }
@@ -170,7 +242,7 @@ class PanelParser {
     final objId = int.tryParse(item.getAttribute('ObjID') ?? '0') ?? 0;
     final svId = int.tryParse(item.getAttribute('svID') ?? '0') ?? 0;
     
-    final id = '${nodeId}_${vdIndex}_${objId}_${svId}';
+    final id = '${nodeId}_${vdIndex}_${objId}_$svId';
     
     // Find matching state variable
     for (final sv in allVars) {
@@ -188,7 +260,7 @@ class PanelParser {
     props['text'] = controlNode.getAttribute('Text') ?? '';
     
     // Extract control properties from ControlProperties element
-    final controlPropsNodes = controlNode.findAllElements('ControlProperties');
+    final controlPropsNodes = controlNode.findAllElements('ControlProperties').toList();
     if (controlPropsNodes.isNotEmpty) {
       final controlProps = controlPropsNodes.first;
       
@@ -234,7 +306,7 @@ class PanelParser {
           .toList();
       
       if (userListProps.isNotEmpty) {
-        final stringLists = userListProps.first.findAllElements('StringList');
+        final stringLists = userListProps.first.findAllElements('StringList').toList();
         for (final item in stringLists) {
           items.add(item.getAttribute('Label') ?? '');
         }
@@ -248,9 +320,9 @@ class PanelParser {
       
       // Extract text lines
       final textLines = <String>[];
-      final textLinesNodes = controlNode.findAllElements('TextLines');
+      final textLinesNodes = controlNode.findAllElements('TextLines').toList();
       if (textLinesNodes.isNotEmpty) {
-        final lineNodes = textLinesNodes.first.findAllElements('Line');
+        final lineNodes = textLinesNodes.first.findAllElements('Line').toList();
         for (final line in lineNodes) {
           textLines.add(line.innerText);
         }

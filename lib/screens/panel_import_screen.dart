@@ -42,18 +42,27 @@ class _PanelImportScreenState extends State<PanelImportScreen> {
     });
 
     try {
-      // Try with any file type without extensions
-      final result = await FilePicker.platform.pickFiles();
+      // Make sure to use any file type without specifying extensions
+      final result = await FilePicker.platform.pickFiles(
+        type: FileType.any, // Don't restrict to any file type
+        allowMultiple: false,
+        withData: false,
+        withReadStream: false,
+        allowCompression: false,
+      );
 
-      if (result != null && result.files.isNotEmpty) {
+      if (result != null && result.files.isNotEmpty && result.files.first.path != null) {
         final file = File(result.files.first.path!);
         _selectedFile = file;
-        _filenameController.text = file.path.split('/').last;
+        
+        // Get just the filename from the path
+        final filename = file.path.split('/').last.split('\\').last;
+        _filenameController.text = filename;
 
-        // Check if it's a panel file by extension
-        if (!file.path.toLowerCase().endsWith('.panel')) {
+        // Check file extension manually
+        if (!filename.toLowerCase().endsWith('.panel')) {
           setState(() {
-            _errorMessage = 'Selected file must have a .panel extension';
+            _errorMessage = 'Selected file should have a .panel extension';
             _isLoading = false;
           });
           return;
@@ -62,16 +71,22 @@ class _PanelImportScreenState extends State<PanelImportScreen> {
         // Try to parse the panel file
         try {
           final panel = await _panelParser.parseFromFile(file.path);
-          _previewPanel = panel;
+          setState(() {
+            _previewPanel = panel;
+          });
         } catch (parseError) {
           setState(() {
             _errorMessage = 'Error parsing panel file: $parseError';
           });
         }
+      } else {
+        setState(() {
+          _errorMessage = 'No file selected';
+        });
       }
     } catch (e) {
       setState(() {
-        _errorMessage = 'Error loading panel file: $e';
+        _errorMessage = 'Error selecting file: $e';
       });
     } finally {
       setState(() {
@@ -84,14 +99,6 @@ class _PanelImportScreenState extends State<PanelImportScreen> {
     if (_selectedFile == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please select a panel file')),
-      );
-      return;
-    }
-
-    final filename = _filenameController.text.trim();
-    if (filename.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter a filename')),
       );
       return;
     }
